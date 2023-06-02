@@ -5,6 +5,7 @@ const fs = require("fs");
 const Web3 = require('web3');
 const web3 = new Web3;
 let abi;
+let newcontractID;
 
 // Configure accounts and keys (testnet credentials)
 const operatorId = AccountId.fromString(process.env.MY_ACCOUNT_ID);
@@ -46,7 +47,40 @@ async function interactWithFactoryContract() {
 
     console.log("TransactionId:", createTokenRx.transactionId.toString());
     console.log("Instance Contract ID:", createTokenRx.contractFunctionResult.createdContractIds.toString());
-    console.log("contract log info:\n", result);
+   // console.log("contract log info:\n", result);
+
+//*****************Calling Child Function **************************
+
+//**************************calling child Function************************************ */
+
+const contractExecuteTx = new ContractExecuteTransaction()
+.setContractId(newcontractID)
+.setGas(300000)
+.setFunction(
+  "incrementValue",
+  new ContractFunctionParameters().addUint256(12)
+);
+const contractExecuteSubmit = await contractExecuteTx.execute(client);
+const contractExecuteRx = await contractExecuteSubmit.getReceipt(client);
+// console.log("The transaction status is " +receipt2.status.toString());
+console.log(`- Contract function call status: ${contractExecuteRx.status} \n`);
+
+//////************************GET FUNCTION CALL******************************** */
+
+
+console.info("========== Calling get Function from childContract ===========");
+//Add Function Call
+console.info("========== Calling get Add Function ===========");
+const contractQueryTx2 = new ContractCallQuery()
+  .setContractId(newcontractID)
+  .setGas(100000)
+  .setFunction("getValue", new ContractFunctionParameters());
+const contractQuerySubmit2 = await contractQueryTx2.execute(client);
+const contractQueryResult2 = contractQuerySubmit2.getUint256(0);
+console.log(`- get value== ${contractQueryResult2} \n`);
+//console.log(`- Get Fuction Result ${contractQueryResult1.s} \n`);
+
+
 
     process.exit();
 
@@ -66,7 +100,7 @@ function decodeEvent(eventName, log, topics) {
     const eventAbi = abi.find(event => (event.name === eventName && event.type === "event"));
     const decodedLog = web3.eth.abi.decodeLog(eventAbi.inputs, log, topics);
     const newContractSolidityAddress = decodedLog.newContract
-    const newcontractID = ContractId.fromSolidityAddress(newContractSolidityAddress).toString();
+    newcontractID = ContractId.fromSolidityAddress(newContractSolidityAddress).toString();
     console.log(newcontractID);
     return decodedLog;
 }
