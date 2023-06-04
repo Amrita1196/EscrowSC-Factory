@@ -24,7 +24,7 @@ async function interactWithFactoryContract() {
     const createContractTx = new ContractExecuteTransaction()
         .setContractId(factoryContractAddress)
         .setGas(1000000)
-        .setFunction("createContract", new ContractFunctionParameters().addUint256(initialValue));
+        .setFunction("createContract", new ContractFunctionParameters().addAddress('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4').addAddress('0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2'));
 
     const createContractSubmit = await createContractTx.execute(client);
 
@@ -57,28 +57,28 @@ const contractExecuteTx = new ContractExecuteTransaction()
 .setContractId(newcontractID)
 .setGas(300000)
 .setFunction(
-  "incrementValue",
-  new ContractFunctionParameters().addUint256(12)
+  "addMilestone",
+  new ContractFunctionParameters().addUint256(0).addString("amrita").addUint256(14).addUint256(15).addUint256(1)
 );
 const contractExecuteSubmit = await contractExecuteTx.execute(client);
 const contractExecuteRx = await contractExecuteSubmit.getReceipt(client);
 // console.log("The transaction status is " +receipt2.status.toString());
 console.log(`- Contract function call status: ${contractExecuteRx.status} \n`);
 
-//////************************GET FUNCTION CALL******************************** */
+// //////************************GET FUNCTION CALL******************************** */
 
 
-console.info("========== Calling get Function from childContract ===========");
-//Add Function Call
-console.info("========== Calling get Add Function ===========");
-const contractQueryTx2 = new ContractCallQuery()
-  .setContractId(newcontractID)
-  .setGas(100000)
-  .setFunction("getValue", new ContractFunctionParameters());
-const contractQuerySubmit2 = await contractQueryTx2.execute(client);
-const contractQueryResult2 = contractQuerySubmit2.getUint256(0);
-console.log(`- get value== ${contractQueryResult2} \n`);
-//console.log(`- Get Fuction Result ${contractQueryResult1.s} \n`);
+// console.info("========== Calling get Function from childContract ===========");
+// //Add Function Call
+// console.info("========== Calling get Add Function ===========");
+// const contractQueryTx2 = new ContractCallQuery()
+//   .setContractId(newcontractID)
+//   .setGas(100000)
+//   .setFunction("getValue", new ContractFunctionParameters());
+// const contractQuerySubmit2 = await contractQueryTx2.execute(client);
+// const contractQueryResult2 = contractQuerySubmit2.getUint256(0);
+// console.log(`- get value== ${contractQueryResult2} \n`);
+// //console.log(`- Get Fuction Result ${contractQueryResult1.s} \n`);
 
 
 
@@ -93,7 +93,7 @@ console.log(`- get value== ${contractQueryResult2} \n`);
  * @param topics an array of event topics
  */
 function decodeEvent(eventName, log, topics) {
-    const abiFile = require("./FactoryContract_sol_FactoryContact.json");
+    const abiFile = require("./FactoryContact.json");
     abi = abiFile.abi;
     // abi = fs.readFileSync("FactoryContract_sol_FactoryContact.abi", "utf8");
     // console.log(abi);

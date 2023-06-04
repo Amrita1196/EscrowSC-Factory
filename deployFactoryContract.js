@@ -16,7 +16,7 @@ async function deployFactoryContract() {
     // Deploy the Factory Contract
     console.info("========== Deploying Factory Contract ===========");
 
-    const factoryContractByteCode = fs.readFileSync("FactoryContract_sol_FactoryContact.bin", "utf8");
+    const factoryContractByteCode = fs.readFileSync("FactoryContractMilStone_sol_FactoryContact.bin", "utf8");
 
     const factoryContractInstantiateTx = new ContractCreateFlow()
         .setBytecode(factoryContractByteCode)
