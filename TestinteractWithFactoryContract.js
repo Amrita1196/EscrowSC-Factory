@@ -1,4 +1,4 @@
-const { Client, AccountId, PrivateKey,ContractId, ContractExecuteTransaction, ContractFunctionParameters, ContractCallQuery } = require("@hashgraph/sdk");
+const { Client, AccountId, PrivateKey,ContractId, ContractExecuteTransaction, Transaction, ContractFunctionParameters, ContractCallQuery } = require("@hashgraph/sdk");
 require("dotenv").config();
 const fs = require("fs");
 
@@ -42,6 +42,7 @@ async function interactWithFactoryContract() {
     });
     
     // decode the event data
+    
     decodeEvent("ContractCreated", logStringHex, logTopics.slice(1));
     
 
@@ -53,13 +54,87 @@ async function interactWithFactoryContract() {
 
 //**************************calling child Function************************************ */
 
+
+//#############################################checking#############################
+
+function numberToBytes32(number) {
+    const bytes = [];
+    for (let i = 0; i < 32; i++) {
+      bytes.unshift(number & 0xff);
+      number = number >> 8;
+    }
+    return Buffer.from(bytes);
+  }
+// Define a function to encode the struct data
+function encodeStruct(id, name, resolveTime, budget, numberRevisions) {
+    const idBytes = numberToBytes32(id);
+    const nameBytes = Buffer.from(name, 'utf8');
+    const resolveTimeBytes = numberToBytes32(resolveTime);
+    const budgetBytes = numberToBytes32(budget);
+    const numberRevisionsBytes = numberToBytes32(numberRevisions);
+  
+    return Buffer.concat([idBytes, nameBytes, resolveTimeBytes, budgetBytes, numberRevisionsBytes]);
+  }
+  // Prepare the struct data
+const milestoneData = encodeStruct(1, 'Milestone 1', 1622851200, 1000, 3);
+
+
+// Prepare the function call
+// const functionParams = new ContractFunctionParameters()
+//   .setContractId(newcontractID)
+//   .setGas(300_000) // Set the desired gas limit (adjust as needed)
+//   .setFunction('addMilestone') // Replace with the actual function name
+//   .addBytearray(milestoneData); // Add the serialized struct as a parameter
+
+// // Submit the function call transaction
+// const transactionId = await new Transaction().setContractFunction(functionParams).execute(client);
+
+// // Retrieve the receipt to check the transaction status
+// const receipt = await transactionId.getReceipt(client);
+
+// // Handle the receipt and transaction status as needed
+// console.log(receipt.status.toString());
+
+
+
+  
+  // Prepare the function call
+//   const functionParams = new ContractFunctionParameters()
+//     .setContractId(newcontractID)
+//     .setGas(30000) // Set the desired gas limit (adjust as needed)
+//     .setFunction('addMilestone') // Replace with the actual function name
+//     .addBytearray(structBytes); // Add the serialized struct as a parameter
+  
+//   // Submit the function call transaction
+//   const transactionId = await new Transaction().setContractFunction(functionParams).execute(client);
+  
+//   // Retrieve the receipt to check the transaction status
+//   const receipt = await transactionId.getReceipt(client);
+  
+//   // Handle the receipt and transaction status as needed
+//   console.log(receipt.status.toString());
+
+
+
+
+
+
+
+
+
+
+
+
+
+//#################################################################################
+
+
+
 const contractExecuteTx = new ContractExecuteTransaction()
 .setContractId(newcontractID)
 .setGas(300000)
-.setFunction(
-  "addMilestone",
-  new ContractFunctionParameters().addUint256(0).addString("amrita").addUint256(14).addUint256(15).addUint256(1)
-);
+.setFunction("addMilestone", new ContractFunctionParameters(milestoneData));
+  
 const contractExecuteSubmit = await contractExecuteTx.execute(client);
 const contractExecuteRx = await contractExecuteSubmit.getReceipt(client);
 // console.log("The transaction status is " +receipt2.status.toString());
